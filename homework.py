@@ -179,11 +179,7 @@ def read_package(workout_type, data: Union[int, str]) -> Training:
 
 def main(training: Training) -> None:
     """Главная функция."""
-    info = InfoMessage(
-        training.__class__.__name__, training.duration,
-        training.get_distance(), training.get_mean_speed(),
-        training.get_spent_calories()
-    )
+    info = training.show_training_info()
     print(info.get_message())
 
 
