@@ -171,7 +171,10 @@ def read_package(workout_type, data: Union[int, str]) -> Training:
         "RUN": Running,
         "WLK": SportsWalking
     }
-    return trackers[workout_type](*data)
+    if workout_type in trackers:
+        return trackers[workout_type](*data)
+    else:
+        raise Exception('Неизвестный тип тренировки')
 
 
 def main(training: Training) -> None:
