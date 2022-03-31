@@ -1,9 +1,10 @@
-from typing import Union, Dict
+from typing import Union, Type
 
 
 class InfoMessage:
     """
     Класс выводящий информационное сообщение о тренировке.
+
     Атрибуты:
     duration: float
         Длительность тренировки
@@ -32,8 +33,8 @@ class InfoMessage:
 
     def get_message(self) -> str:
         """
-        Задаёт формат сообщения,
-        возвращает информационное сообщение о тренировке.
+        Принимает данные о пройденной тренировке,
+        возвращает информационное сообщение.
         """
         return (
             f"Тип тренировки: {self.training_type}; "
@@ -74,7 +75,7 @@ class Training:
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         raise NotImplementedError(
-            'Определите get_spent_calories() в %s.' % (self.__class__.__name__)
+            f'{self.__class__.__name__} Определите get_spent_calories()'
         )
 
     def show_training_info(self) -> InfoMessage:
@@ -111,23 +112,25 @@ class SportsWalking(Training):
     Наследуемый класс рассчитывает калории для спортивной ходьбы.
     """
 
-    C1: float = 0.035
-    C2: float = 0.029
+    COEFF_CAL_1: float = 0.035
+    COEFF_CAL_2: float = 0.029
 
-    def __init__(self, action, duration, weight, height):
+    def __init__(
+        self,
+        action: int,
+        duration: int,
+        weight: float,
+        height: float
+    ) -> float:
         super().__init__(action, duration, weight)
         self.height = height
 
     def get_spent_calories(self) -> float:
-        """
-        Получить количество затраченных калорий для спортивной ходьбы.
-        """
-        return ((
-            self.C1 * self.weight
-            + (self.get_mean_speed()**2 // self.height)
-            * self.C2 * self.weight)
-            * (self.H_IN_M * self.duration)
-        )
+        """Получить количество затраченных калорий."""
+        return ((self.COEFF_CAL_1 * self.weight
+                + (self.get_mean_speed()**2 // self.height)
+                * self.COEFF_CAL_2 * self.weight)
+                * (self.H_IN_M * self.duration))
 
 
 class Swimming(Training):
@@ -140,7 +143,14 @@ class Swimming(Training):
     COEFF_1: float = 1.1
     COEFF_2: int = 2
 
-    def __init__(self, action, duration, weight, length_pool, count_pool):
+    def __init__(
+        self,
+        action: int,
+        duration: int,
+        weight: float,
+        length_pool: float,
+        count_pool: int
+    ) -> float:
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
@@ -164,17 +174,16 @@ class Swimming(Training):
         )
 
 
-def read_package(workout_type, data: Union[int, str]) -> Training:
+def read_package(workout_type: str, data: Union[int, float]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    trackers: Dict[str, str] = {
+    trackers: Type[Training] = {
         "SWM": Swimming,
         "RUN": Running,
         "WLK": SportsWalking
     }
     if workout_type in trackers:
         return trackers[workout_type](*data)
-    else:
-        raise Exception('Неизвестный тип тренировки')
+    raise Exception(f'Неизвестный тип тренировки {workout_type}')
 
 
 def main(training: Training) -> None:
