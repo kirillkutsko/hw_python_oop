@@ -1,4 +1,4 @@
-from typing import Union, Type
+from typing import Union, Type, List, Dict
 
 
 class InfoMessage:
@@ -16,7 +16,7 @@ class InfoMessage:
         Потраченные калории.
     Методы:
     get_message()
-        Возвращает информационное сообщение о тренировке.
+        Вернуть информационное сообщение о тренировке.
     """
 
     def __init__(self,
@@ -33,8 +33,9 @@ class InfoMessage:
 
     def get_message(self) -> str:
         """
-        Принимает данные о пройденной тренировке,
-        возвращает информационное сообщение.
+        Принять данные о пройденной тренировке.
+        
+        Вернуть информационное сообщение.
         """
         return (
             f"Тип тренировки: {self.training_type}; "
@@ -48,7 +49,8 @@ class InfoMessage:
 class Training:
     """
     Базовый класс тренировки.
-    Расчитывает дистанцию и среднюю скорость.
+
+    Расчитать дистанцию и среднюю скорость.
     """
 
     M_IN_KM: int = 1000
@@ -93,7 +95,8 @@ class Training:
 class Running(Training):
     """
     Тренировка: бег.
-    Наследуемый класс рассчитывает калории для бега.
+
+    Наследуемый класс рассчитать калории для бега.
     """
 
     COEFF_CAL_1: int = 18
@@ -108,34 +111,37 @@ class Running(Training):
 
 
 class SportsWalking(Training):
-    """Тренировка: спортивная ходьба.
-    Наследуемый класс рассчитывает калории для спортивной ходьбы.
+    """
+    Тренировка: спортивная ходьба.
+
+    Наследуемый класс рассчитать калории для спортивной ходьбы.
     """
 
     COEFF_CAL_1: float = 0.035
     COEFF_CAL_2: float = 0.029
 
-    def __init__(
-        self,
-        action: int,
-        duration: int,
-        weight: float,
-        height: float
-    ) -> float:
+    def __init__(self,
+                 action: int,
+                 duration: int,
+                 weight: float,
+                 height: float) -> None:
         super().__init__(action, duration, weight)
         self.height = height
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        return ((self.COEFF_CAL_1 * self.weight
+        return (
+            (self.COEFF_CAL_1 * self.weight
                 + (self.get_mean_speed()**2 // self.height)
                 * self.COEFF_CAL_2 * self.weight)
-                * (self.H_IN_M * self.duration))
+            * (self.H_IN_M * self.duration)
+        )
 
 
 class Swimming(Training):
     """Тренировка: плавание.
-    Наследуемый класс рассчитывает калории для плавания и
+
+    Наследуемый класс рассчитать калории для плавания и
     среднюю скорость.
     """
 
@@ -156,27 +162,23 @@ class Swimming(Training):
         self.count_pool = count_pool
 
     def get_spent_calories(self) -> float:
-        """
-        Получить количество затраченных калорий для плавания.
-        """
+        """Получить количество затраченных калорий для плавания."""
         return (
             (self.get_mean_speed() + self.COEFF_1)
             * self.COEFF_2 * self.weight
         )
 
     def get_mean_speed(self) -> float:
-        """
-        Получить среднюю скорость движения для плавания.
-        """
+        """Получить среднюю скорость движения для плавания."""
         return (
             self.length_pool * self.count_pool
             / self.M_IN_KM / self.duration
         )
 
 
-def read_package(workout_type: str, data: Union[int, float]) -> Training:
+def read_package(workout_type: str, data: List[Union[int, float]]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    trackers: Type[Training] = {
+    trackers: Dict[str, Type[Training]] = {
         "SWM": Swimming,
         "RUN": Running,
         "WLK": SportsWalking
