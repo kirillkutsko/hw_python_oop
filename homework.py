@@ -3,7 +3,7 @@ from typing import Union, Type, List, Dict
 
 class InfoMessage:
     """
-    Класс выводящий информационное сообщение о тренировке.
+    Возвращает информационное сообщение о тренировке.
 
     Атрибуты:
     duration: float
@@ -34,7 +34,7 @@ class InfoMessage:
     def get_message(self) -> str:
         """
         Принять данные о пройденной тренировке.
-        
+
         Вернуть информационное сообщение.
         """
         return (
